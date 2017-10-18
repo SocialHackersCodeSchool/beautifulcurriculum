@@ -1,0 +1,20 @@
+// This is a repository containing an overview of the curriculum
+homepage=https://github.com/HackYourFuture/curriculum
+// This is the file name of the home page
+homepage_filename=README.md
+
+// List all of the modules that make up the curricuulm
+module=https://github.com/HackYourFuture/HTML-CSS
+module=https://github.com/HackYourFuture/JavaScript
+module=https://github.com/HackYourFuture/CommandLine
+module=https://github.com/HackYourFuture/Git
+module=https://github.com/HackYourFuture/Node.js
+module=https://github.com/HackYourFuture/databases
+module=https://github.com/HackYourFuture/React
+module=https://github.com/HackYourFuture/Project
+
+// List important files that want to be highlighted.
+// A different name can be given for them in brackets.
+important_file=README.md(Reading)
+important_file=MAKEME.md(Homework)
+important_file=REVIEW.md(Review)
