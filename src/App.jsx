@@ -15,42 +15,23 @@ class App extends Component {
     }
 }
 
-class Nav extends React.Component {
-    render() {
-        return (
-            <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-                <a className="navbar-brand" href="#">{config.organisationName}</a>
-                <button className="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-
-                <div className="collapse navbar-collapse" id="navbarsExampleDefault">
-                    <ul className="navbar-nav mr-auto">
-                        <li className="nav-item active">
-                            <a className="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">Settings</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        );
-    }
-}
-
 class Content extends React.Component {
     constructor(){
         super();
         this.state = {
-            data: [],
             html: "",
             modules: []
         };
     }
 
     loadData() {
-        fetch("https://api.github.com/repos/"+ config.homepage +"/contents")
+        var pathname = window.location.pathname.substring(1);
+
+        if(pathname === "/" || pathname === ""){
+            pathname = config.homepage;
+        }
+
+        fetch("https://api.github.com/repos/"+ pathname + "/contents")
         .then(response => response.json())
         .then(json => {
             json.forEach( item => {
@@ -113,21 +94,22 @@ class Content extends React.Component {
 
     convert(markdown){
         var converter = new showdown.Converter();
+        converter.setOption('tables', 'true');
         var converted = converter.makeHtml(markdown);
         converted = converted.replace("class", "className")
         return converted;
     }
 
     render() {
-        // I feel like this definetly isn't the right thing to do here
+        // I feel like this definetly isn't the right way to do this
         const self = this;
 
         function getSideButton(item, index) {
             return (
                 <li class="nav-item">
-                    <a class="nav-link" href={item.repo.html_url}>{item.repo.name}</a>
+                    <a class="nav-link" href={"/" + item.repo.full_name}>{item.repo.name}</a>
                     {self.state.modules[index].dirs.map((itemDir, index) => {
-                        return <a class="nav-link nav-link-small" href={itemDir.html_url}>{itemDir.name}</a>
+                        return <a class="nav-link nav-link-small" href={"/" + item.repo.full_name + "/" + itemDir.path}>{itemDir.name}</a>
                     })}
                 </li>
             )
@@ -145,10 +127,34 @@ class Content extends React.Component {
                     </nav>
 
                     <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
-                        <div dangerouslySetInnerHTML={{ __html: this.convert(this.state.html) }} />
+                        <div dangerouslySetInnerHTML={{ __html: this.state.html }} />
                     </main>
                 </div>
             </div>
+        );
+    }
+}
+
+class Nav extends React.Component {
+    render() {
+        return (
+            <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a className="navbar-brand" href="#">{config.organisationName}</a>
+                <button className="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+
+                <div className="collapse navbar-collapse" id="navbarsExampleDefault">
+                    <ul className="navbar-nav mr-auto">
+                        <li className="nav-item active">
+                            <a className="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link" href="#">Settings</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         );
     }
 }
