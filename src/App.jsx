@@ -53,39 +53,40 @@ class Content extends React.Component {
         fetch("https://api.github.com/repos/"+ config.homepage +"/contents")
         .then(response => response.json())
         .then(json => {
-            for (var i in json){
-                if(json[i].name === config.homepageFilename){
-                    this.loadReadMe(json[i].download_url);
+            json.forEach( item => {
+                if(item.name === config.homepageFilename){
+                    this.fetchMarkdownAsHtml(item.download_url, html =>{
+                        this.setState({
+                            html: html
+                        });
+                    });
                 }
-            }
-        });
-    }
-
-    loadReadMe(url){
-        fetch(url)
-        .then((response) => {
-            return response.text();
-        }).then((text) => {
-            this.setState({
-                html: this.convert(text)
             });
         });
     }
 
+    fetchMarkdownAsHtml(url, callback){
+        fetch(url)
+        .then((response) => {
+            return response.text();
+        }).then((text) => {
+            callback(this.convert(text));
+        });
+    }
+
     loadSideNav(){
-        for (var i in config.modules){
-            console.log(config.modules[i]);
-            fetch("https://api.github.com/repos/"+ config.modules[i])
+        config.modules.forEach(module => {
+            fetch("https://api.github.com/repos/"+ module)
             .then(response => response.json())
             .then(json => {
                 this.getModuleContents(json.full_name, jsondir => {
                     var directories = [];
 
-                    for(var j in jsondir){
-                        if(jsondir[j].type === "dir"){
-                            directories.push(jsondir[j]);
+                    jsondir.forEach(item => {
+                        if(item.type === "dir"){
+                            directories.push(item);
                         }
-                    }
+                    })
 
                     var arrayvar = this.state.modules.slice()
                     arrayvar.push({repo:json, dirs:directories})
@@ -94,7 +95,7 @@ class Content extends React.Component {
                     console.log(directories);
                 });
             });
-        }
+        });
     }
 
     getModuleContents(repoName, callback){
@@ -118,6 +119,7 @@ class Content extends React.Component {
     }
 
     render() {
+        // I feel like this definetly isn't the right thing to do here
         const self = this;
 
         function getSideButton(item, index) {
