@@ -120,6 +120,7 @@ class Content extends React.Component {
                 <div class="row">
                     <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
                         <ul class="nav nav-pills flex-column">
+                            <a class="nav-link" href="/">Home</a>
                             {this.state.modules.map((item, index) => {
                                 return getSideButton(item, index);
                             })}
