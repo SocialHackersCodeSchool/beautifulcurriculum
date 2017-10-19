@@ -1,0 +1,29 @@
+{
+  "homepage": "HackYourFuture/curriculum",
+  "homepageFilename": "README.md",
+  "organisationName": "HackYourFuture",
+  "modules": [
+    "HackYourFuture/HTML-CSS",
+    "HackYourFuture/JavaScript",
+    "HackYourFuture/CommandLine",
+    "HackYourFuture/Git",
+    "HackYourFuture/Node.js",
+    "HackYourFuture/databases",
+    "HackYourFuture/React",
+    "HackYourFuture/Project"
+  ],
+  "importantFiles": [
+    {
+      "filename": "README.md",
+      "title": "Reading"
+    },
+    {
+      "filename": "MAKEME.md",
+      "title": "Homework"
+    },
+    {
+      "filename": "REVIEW.md",
+      "title": "Review"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import showdown from 'showdown'
+import config from './config.json';
 
 class App extends Component {
     render() {
@@ -18,7 +19,7 @@ class Nav extends React.Component {
     render() {
         return (
             <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-                <a className="navbar-brand" href="#">Dashboard</a>
+                <a className="navbar-brand" href="#">{config.organisationName}</a>
                 <button className="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -30,12 +31,6 @@ class Nav extends React.Component {
                         </li>
                         <li className="nav-item">
                             <a className="nav-link" href="#">Settings</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">Profile</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">Help</a>
                         </li>
                     </ul>
                 </div>
@@ -49,37 +44,70 @@ class Content extends React.Component {
         super();
         this.state = {
             data: [],
-            html: ""
+            html: "",
+            modules: []
         };
     }
 
     loadData() {
-        fetch("https://api.github.com/repos/HackYourFuture/curriculum/contents")
+        fetch("https://api.github.com/repos/"+ config.homepage +"/contents")
         .then(response => response.json())
         .then(json => {
-            console.log(json);
+            for (var i in json){
+                if(json[i].name === config.homepageFilename){
+                    this.loadReadMe(json[i].download_url);
+                }
+            }
+        });
+    }
+
+    loadReadMe(url){
+        fetch(url)
+        .then((response) => {
+            return response.text();
+        }).then((text) => {
             this.setState({
-                data: json
+                html: this.convert(text)
             });
         });
     }
 
-    loadReadMe(){
-        fetch("https://raw.githubusercontent.com/HackYourFuture/curriculum/master/README.md")
-        .then((response) => {
-            return response.text();
-        }).then((text) => {
-            console.log(text);
-            var converted = this.convert(text);
-            console.log(converted);
-            this.setState({
-                html: converted
+    loadSideNav(){
+        for (var i in config.modules){
+            console.log(config.modules[i]);
+            fetch("https://api.github.com/repos/"+ config.modules[i])
+            .then(response => response.json())
+            .then(json => {
+                this.getModuleContents(json.full_name, jsondir => {
+                    var directories = [];
+
+                    for(var j in jsondir){
+                        if(jsondir[j].type === "dir"){
+                            directories.push(jsondir[j]);
+                        }
+                    }
+
+                    var arrayvar = this.state.modules.slice()
+                    arrayvar.push({repo:json, dirs:directories})
+                    this.setState({ modules: arrayvar })
+
+                    console.log(directories);
+                });
             });
+        }
+    }
+
+    getModuleContents(repoName, callback){
+        fetch("https://api.github.com/repos/"+ repoName +"/contents")
+        .then(response => response.json())
+        .then(json => {
+            callback(json);
         });
     }
 
     componentDidMount() {
-        this.loadReadMe()
+        this.loadData()
+        this.loadSideNav();
     }
 
     convert(markdown){
@@ -90,50 +118,27 @@ class Content extends React.Component {
     }
 
     render() {
+        const self = this;
+
+        function getSideButton(item, index) {
+            return (
+                <li class="nav-item">
+                    <a class="nav-link" href={item.repo.html_url}>{item.repo.name}</a>
+                    {self.state.modules[index].dirs.map((itemDir, index) => {
+                        return <a class="nav-link nav-link-small" href={itemDir.html_url}>{itemDir.name}</a>
+                    })}
+                </li>
+            )
+        }
+
         return (
             <div class="container-fluid">
                 <div class="row">
                     <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
                         <ul class="nav nav-pills flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Overview <span class="sr-only">(current)</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Reports</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Analytics</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Export</a>
-                            </li>
-                        </ul>
-
-                        <ul class="nav nav-pills flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Nav item</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Nav item again</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">One more nav</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Another nav item</a>
-                            </li>
-                        </ul>
-
-                        <ul class="nav nav-pills flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Nav item again</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">One more nav</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Another nav item</a>
-                            </li>
+                            {this.state.modules.map((item, index) => {
+                                return getSideButton(item, index);
+                            })}
                         </ul>
                     </nav>
 
