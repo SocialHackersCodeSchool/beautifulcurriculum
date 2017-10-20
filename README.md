@@ -10,8 +10,13 @@ Currently, the HackYourFuture curriculm is difficult to navigate between, fairly
 
 Technically, the back end for the curriculum should only rely on the raw Markdown files in Github with all changes only made in CSS. Navigation structure for the BC should also follow the same struction as on Github e.g. *beautifulcurriculum.com/HTML-CSS/Week1/README.md* equates to *github.com/HTML-CSS/Week1/README.md*.
 
+## How does this work?
+Using the GitHub API the website queries the root repositiories of all of the included modules. When the user clicks on a link it will attempt to load the file requested. If the file is a Markdown file then it was convert the markdown into HTML tags and load them in the window. 
+
 ## How can you help?
 I'll try to keep the issues tab open with ongoing bugs and improvements. If you know Design, then please help me. Please.
+
+Talk to me on Slack if you want to help!
 
 ## Installation
 To install, pull the repository, navigate to the folder and type:
