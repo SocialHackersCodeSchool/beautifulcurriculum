@@ -1,5 +1,10 @@
 # BeautifulCurriculum
 
+## Live Demo
+[A live version of BeautifulCurriculum can be found here.](https://enigmatic-tundra-23218.herokuapp.com/)
+
+This website is updated whenever code is pushed to master.
+
 ## What is the goal of this project?
 Currently, the HackYourFuture curriculm is difficult to navigate between, fairly confusing when first approached and is not easy to use on mobile. With BeautifulCurriculum I (we) want to present the curriculum in an easy to digest way that promotes and encourage the reader to browse at their leisure.
 
