@@ -15,7 +15,7 @@ Using the GitHub API the website queries the root repositiories of all of the in
 
 This project uses react and node.
 
-This project used [https://github.com/showdownjs/showdown](showdown) to convert markdown to HTML. It's worth looking into to tweak the settings that it works with as they might not be optimal right now.
+This project uses [showdown](https://github.com/showdownjs/showdown) to convert markdown to HTML. It's worth looking into to tweak the settings that it works with as they might not be optimal right now.
 
 ## How can you help?
 I'll try to keep the issues tab open with ongoing bugs and improvements. If you know Design, then please help me. Please.
