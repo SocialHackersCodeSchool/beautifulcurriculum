@@ -1,8 +1,13 @@
 .nav-link{
     font-weight: bold;
+    font-size: 20px;
 }
 
 .nav-link-small{
-    font-size: 12px;
+    font-size: 16px;
     font-weight: normal;
+}
+
+.nav-link-smallest{
+    font-size: 12px;
 }

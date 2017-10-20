@@ -41,6 +41,16 @@ class Content extends React.Component {
         return pathname.split("/").length === 3;
     }
 
+    getPath(){
+        var path = window.location.pathname;
+
+        if(path.substr(path.length-1) === "/"){
+            path = path.substring(0, path.length-1);
+        }
+
+        return path;
+    }
+
     getPathForContent(pathname){
         if(pathname === "/" || pathname === ""){
             return "https://raw.githubusercontent.com" + config.homepage + "/master/" + config.homepageFilename;
@@ -65,7 +75,7 @@ class Content extends React.Component {
     }
 
     loadData() {
-        var pathname = window.location.pathname;
+        var pathname = this.getPath();
 
         if(this.isRepository(pathname)){
             fetch(this.getPathForContent(pathname))
@@ -198,12 +208,27 @@ class Content extends React.Component {
         // I feel like this definetly isn't the right way to do this
         const self = this;
 
+        function getDirectoryContents(){
+            console.log("Worked")
+        }
+
         function getSideButton(item, index) {
             return (
                 <li class="nav-item">
                     <a class="nav-link" href={"/" + item.repo.full_name}>{item.repo.name}</a>
                     {self.state.modules[index].dirs.map((itemDir, index) => {
-                        return <a class="nav-link nav-link-small" href={"/" + item.repo.full_name + "/" + itemDir.path}>{itemDir.name}</a>
+                        return <li>
+                            <a href="#" onclick="getDirectoryContents()" data-toggle="collapse" data-target={"#toggle" + itemDir.sha} data-parent="#sidenav01" class="nav-link nav-link-small collapsed">
+                                {itemDir.name}
+                            </a>
+                            <div class="collapse" id={"toggle" + itemDir.sha} style={{height: "0px"}}>
+                                <ul>
+                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu2</a></li>
+                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu3</a></li>
+                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu4</a></li>
+                                </ul>
+                            </div>
+                        </li>
                     })}
                 </li>
             )
@@ -218,20 +243,6 @@ class Content extends React.Component {
                             {this.state.modules.map((item, index) => {
                                 return getSideButton(item, index);
                             })}
-
-                            <li>
-                                <a href="#" data-toggle="collapse" data-target="#toggleDemo" data-parent="#sidenav01" class="collapsed">
-                                    <span class="glyphicon glyphicon-cloud"></span> Submenu 1 <span class="caret pull-right"></span>
-                                </a>
-                                <div class="collapse" id="toggleDemo" style={{height: "0px"}}>
-                                    <ul class="nav nav-list">
-                                        <li><a href="#">Submenu2</a></li>
-                                        <li><a href="#">Submenu3</a></li>
-                                        <li><a href="#">Submenu4</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-
                         </ul>
                     </nav>
 
