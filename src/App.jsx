@@ -6,6 +6,18 @@ import config from './config.json';
 import EmojiConvertor from 'emoji-js';
 
 class App extends Component {
+    componentDidMount() {
+        this.setFavicon();
+    }
+
+    setFavicon() {
+        var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = 'http://s2.googleusercontent.com/s2/favicons?domain_url=' + config.website;
+        document.getElementsByTagName('head')[0].appendChild(link);
+    }
+
     render() {
         return (
             <div>
@@ -126,7 +138,7 @@ class Content extends React.Component {
         var converter = new showdown.Converter();
         converter.setOption('tables', 'true');
         var converted = converter.makeHtml(markdown);
-        
+
         converted = converted.replace("class", "className")
         converted = this.convertInternalLinks(converted);
         converted = this.replaceEmojis(converted);

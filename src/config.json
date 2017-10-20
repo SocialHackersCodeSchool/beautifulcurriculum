@@ -1,6 +1,7 @@
 {
   "homepage": "/HackYourFuture/curriculum",
   "homepageFilename": "README.md",
+  "website": "http://www.hackyourfuture.net/",
   "organisationName": "HackYourFuture",
   "modules": [
     "HackYourFuture/HTML-CSS",
