@@ -4,6 +4,8 @@ import './App.css';
 import showdown from 'showdown'
 import config from './config.json';
 import EmojiConvertor from 'emoji-js';
+import * as linkify from 'linkifyjs';
+import linkifyHtml from 'linkifyjs/html';
 
 class App extends Component {
     componentDidMount() {
@@ -149,6 +151,10 @@ class Content extends React.Component {
         converted = converted.replace("class", "className")
         converted = this.convertInternalLinks(converted);
         converted = this.replaceEmojis(converted);
+
+        converted = linkifyHtml(converted, {
+          defaultProtocol: 'https'
+        });
 
         return converted;
     }
