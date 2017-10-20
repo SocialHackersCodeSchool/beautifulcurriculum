@@ -13,7 +13,7 @@ Technically, the back end for the curriculum should only rely on the raw Markdow
 ## How does this work?
 Using the GitHub API the website queries the root repositiories of all of the included modules. When the user clicks on a link it will attempt to load the file requested. If the file is a Markdown file then it was convert the markdown into HTML tags and load them in the window. If the file is a directory then at the moment it will fail. In the future graceful handling of dictories is required.
 
-This project used react and node.
+This project uses react and node.
 
 ## How can you help?
 I'll try to keep the issues tab open with ongoing bugs and improvements. If you know Design, then please help me. Please.
