@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import showdown from 'showdown'
 import config from './config.json';
+import EmojiConvertor from 'emoji-js';
 
 class App extends Component {
     render() {
@@ -24,26 +25,57 @@ class Content extends React.Component {
         };
     }
 
-    loadData() {
-        var pathname = window.location.pathname.substring(1);
+    isRepository(pathname){
+        return pathname.split("/").length === 3;
+    }
 
+    getPathForContent(pathname){
         if(pathname === "/" || pathname === ""){
-            pathname = config.homepage;
+            return "https://raw.githubusercontent.com" + config.homepage + "/master/" + config.homepageFilename;
         }
 
-        fetch("https://api.github.com/repos/"+ pathname + "/contents")
-        .then(response => response.json())
-        .then(json => {
-            json.forEach( item => {
-                if(item.name === config.homepageFilename){
-                    this.fetchMarkdownAsHtml(item.download_url, html =>{
-                        this.setState({
-                            html: html
+        console.log(pathname);
+        console.log(this.isRepository(pathname));
+
+        if(this.isRepository(pathname)){
+            return "https://api.github.com/repos"+ pathname + "/contents";
+        } else {
+            var split = pathname.split("/");
+            var pathHold = pathname.replace("/" + split[1] + "/" + split[2], "");
+
+            console.log("https://raw.githubusercontent.com" + "/" + split[1] + "/" + split[2] + "/master" + pathHold)
+            return "https://raw.githubusercontent.com" + "/" + split[1] + "/" + split[2] + "/master" + pathHold
+        }
+    }
+
+    isFile(pathname) {
+        return pathname.split('/').pop().indexOf('.') > -1;
+    }
+
+    loadData() {
+        var pathname = window.location.pathname;
+
+        if(this.isRepository(pathname)){
+            fetch(this.getPathForContent(pathname))
+            .then(response => response.json())
+            .then(json => {
+                json.forEach( item => {
+                    if(item.name === config.homepageFilename){
+                        this.fetchMarkdownAsHtml(item.download_url, html =>{
+                            this.setState({
+                                html: html
+                            });
                         });
-                    });
-                }
+                    }
+                });
             });
-        });
+        } else {
+            this.fetchMarkdownAsHtml(this.getPathForContent(pathname), html =>{
+                this.setState({
+                    html: html
+                });
+            });
+        }
     }
 
     fetchMarkdownAsHtml(url, callback){
@@ -69,11 +101,9 @@ class Content extends React.Component {
                         }
                     })
 
-                    var arrayvar = this.state.modules.slice()
-                    arrayvar.push({repo:json, dirs:directories})
-                    this.setState({ modules: arrayvar })
-
-                    console.log(directories);
+                    var arrayvar = this.state.modules.slice();
+                    arrayvar.push({repo:json, dirs:directories});
+                    this.setState({ modules: arrayvar });
                 });
             });
         });
@@ -96,8 +126,60 @@ class Content extends React.Component {
         var converter = new showdown.Converter();
         converter.setOption('tables', 'true');
         var converted = converter.makeHtml(markdown);
+        
         converted = converted.replace("class", "className")
+        converted = this.convertInternalLinks(converted);
+        converted = this.replaceEmojis(converted);
+
         return converted;
+    }
+
+    replaceEmojis(html){
+        var emoji = new EmojiConvertor();
+        html = emoji.replace_colons(html);
+        return html;
+    }
+
+    convertInternalLinks(html){
+        var matches = this.findUrls(html);
+        if(matches !== null){
+            matches.forEach(match => {
+                config.modules.forEach(moduleName => {
+                    if(match.indexOf(moduleName) !== -1){
+                        console.log(match);
+
+                        var newUrl = match.replace("https://github.com/", "");
+                        newUrl = newUrl.replace("/blob/master", "");
+                        newUrl = newUrl.replace("/master", "");
+                        newUrl = newUrl.replace("/tree", "");
+                        newUrl = "/" + newUrl;
+
+                        html = html.replace(match, newUrl);
+                    }
+                });
+            });
+        }
+
+        return html;
+    }
+
+    findUrls( text ){
+        var source = (text || '').toString();
+        var urlArray = [];
+        var url;
+        var matchArray;
+
+        // Regular expression to find FTP, HTTP(S) and email URLs.
+        var regexToken = /(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g;
+
+        // Iterate through any URLs in the text.
+        while( (matchArray = regexToken.exec( source )) !== null )
+        {
+            var token = matchArray[0];
+            urlArray.push( token );
+        }
+
+        return urlArray;
     }
 
     render() {
@@ -124,6 +206,20 @@ class Content extends React.Component {
                             {this.state.modules.map((item, index) => {
                                 return getSideButton(item, index);
                             })}
+
+                            <li>
+                                <a href="#" data-toggle="collapse" data-target="#toggleDemo" data-parent="#sidenav01" class="collapsed">
+                                    <span class="glyphicon glyphicon-cloud"></span> Submenu 1 <span class="caret pull-right"></span>
+                                </a>
+                                <div class="collapse" id="toggleDemo" style={{height: "0px"}}>
+                                    <ul class="nav nav-list">
+                                        <li><a href="#">Submenu2</a></li>
+                                        <li><a href="#">Submenu3</a></li>
+                                        <li><a href="#">Submenu4</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+
                         </ul>
                     </nav>
 
