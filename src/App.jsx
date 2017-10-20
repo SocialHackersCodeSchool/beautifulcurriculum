@@ -33,7 +33,8 @@ class Content extends React.Component {
         super();
         this.state = {
             html: "",
-            modules: []
+            modules: [],
+            content: {}
         };
     }
 
@@ -56,16 +57,11 @@ class Content extends React.Component {
             return "https://raw.githubusercontent.com" + config.homepage + "/master/" + config.homepageFilename;
         }
 
-        console.log(pathname);
-        console.log(this.isRepository(pathname));
-
         if(this.isRepository(pathname)){
             return "https://api.github.com/repos"+ pathname + "/contents";
         } else {
             var split = pathname.split("/");
             var pathHold = pathname.replace("/" + split[1] + "/" + split[2], "");
-
-            console.log("https://raw.githubusercontent.com" + "/" + split[1] + "/" + split[2] + "/master" + pathHold)
             return "https://raw.githubusercontent.com" + "/" + split[1] + "/" + split[2] + "/master" + pathHold
         }
     }
@@ -142,6 +138,7 @@ class Content extends React.Component {
     componentDidMount() {
         this.loadData()
         this.loadSideNav();
+
     }
 
     convert(markdown){
@@ -162,21 +159,22 @@ class Content extends React.Component {
         return html;
     }
 
+    convertUrl(url){
+        var newUrl = url.replace("https://github.com/", "");
+        newUrl = newUrl.replace("/blob/master", "");
+        newUrl = newUrl.replace("/master", "");
+        newUrl = newUrl.replace("/tree", "");
+        newUrl = "/" + newUrl;
+        return newUrl;
+    }
+
     convertInternalLinks(html){
         var matches = this.findUrls(html);
         if(matches !== null){
             matches.forEach(match => {
                 config.modules.forEach(moduleName => {
                     if(match.indexOf(moduleName) !== -1){
-                        console.log(match);
-
-                        var newUrl = match.replace("https://github.com/", "");
-                        newUrl = newUrl.replace("/blob/master", "");
-                        newUrl = newUrl.replace("/master", "");
-                        newUrl = newUrl.replace("/tree", "");
-                        newUrl = "/" + newUrl;
-
-                        html = html.replace(match, newUrl);
+                        html = html.replace(match, this.convertUrl(match));
                     }
                 });
             });
@@ -195,8 +193,7 @@ class Content extends React.Component {
         var regexToken = /(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g;
 
         // Iterate through any URLs in the text.
-        while( (matchArray = regexToken.exec( source )) !== null )
-        {
+        while( (matchArray = regexToken.exec( source )) !== null ){
             var token = matchArray[0];
             urlArray.push( token );
         }
@@ -208,8 +205,56 @@ class Content extends React.Component {
         // I feel like this definetly isn't the right way to do this
         const self = this;
 
-        function getDirectoryContents(){
-            console.log("Worked")
+        function fetchContentForDirection(url, callback){
+            fetch(url)
+            .then(response => response.json())
+            .then(json => {
+                callback(json);
+            });
+        }
+
+        function getDirectoryContents(itemDir){
+            if(self.state.content[itemDir.sha] === undefined){
+                fetchContentForDirection(itemDir.url, json => {
+                    var content = self.state.content;
+                    content[itemDir.sha] = json;
+                    self.setState({ content });
+                })
+            }
+        }
+
+        function convertUrl(url){
+            var newUrl = url.replace("https://github.com/", "");
+            newUrl = newUrl.replace("/blob/master", "");
+            newUrl = newUrl.replace("/master", "");
+            newUrl = newUrl.replace("/tree", "");
+            newUrl = "/" + newUrl;
+            return newUrl;
+        }
+
+        function convertName(name){
+            var newName = name;
+
+            config.importantFiles.forEach(item => {
+                    if(item.filename === name){
+                        console.log(item.title);
+                        newName = item.title;
+                    }
+            })
+
+            return newName;
+        }
+
+        function getContent(itemDir){
+            var html = []
+
+            if(self.state.content !== undefined && self.state.content[itemDir.sha] !== undefined){
+                self.state.content[itemDir.sha].map((content, index) => {
+                    html.push(<li><a class='nav-link nav-link-smallest' href={convertUrl(content.html_url)}>{convertName(content.name)}</a></li>)
+                })
+            }
+
+            return html
         }
 
         function getSideButton(item, index) {
@@ -218,14 +263,12 @@ class Content extends React.Component {
                     <a class="nav-link" href={"/" + item.repo.full_name}>{item.repo.name}</a>
                     {self.state.modules[index].dirs.map((itemDir, index) => {
                         return <li>
-                            <a href="#" onclick="getDirectoryContents()" data-toggle="collapse" data-target={"#toggle" + itemDir.sha} data-parent="#sidenav01" class="nav-link nav-link-small collapsed">
+                            <a href="#" onClick={() => getDirectoryContents(itemDir)} data-toggle="collapse" data-target={"#toggle" + itemDir.sha} data-parent="#sidenav01" class="nav-link nav-link-small collapsed">
                                 {itemDir.name}
                             </a>
                             <div class="collapse" id={"toggle" + itemDir.sha} style={{height: "0px"}}>
                                 <ul>
-                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu2</a></li>
-                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu3</a></li>
-                                    <li><a class="nav-link nav-link-smallest" href="#">Submenu4</a></li>
+                                    {getContent(itemDir)}
                                 </ul>
                             </div>
                         </li>
