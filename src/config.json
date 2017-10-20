@@ -15,16 +15,20 @@
   ],
   "importantFiles": [
     {
-      "filename": "README.md",
+      "filename": "readme.md",
       "title": "Reading"
     },
     {
-      "filename": "MAKEME.md",
+      "filename": "makeme.md",
       "title": "Homework"
     },
     {
-      "filename": "REVIEW.md",
+      "filename": "review.md",
       "title": "Review"
+    },
+    {
+      "filename": "exercises.md",
+      "title": "Exercises"
     }
   ]
 }

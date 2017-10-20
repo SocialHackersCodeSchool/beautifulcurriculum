@@ -236,7 +236,7 @@ class Content extends React.Component {
             var newName = name;
 
             config.importantFiles.forEach(item => {
-                    if(item.filename === name){
+                    if(item.filename.toLowerCase() === name.toLowerCase()){
                         console.log(item.title);
                         newName = item.title;
                     }
