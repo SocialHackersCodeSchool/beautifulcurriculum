@@ -140,7 +140,6 @@ class Content extends React.Component {
     componentDidMount() {
         this.loadData()
         this.loadSideNav();
-
     }
 
     convert(markdown){
@@ -153,7 +152,7 @@ class Content extends React.Component {
         converted = this.replaceEmojis(converted);
 
         converted = linkifyHtml(converted, {
-          defaultProtocol: 'https'
+            defaultProtocol: 'https'
         });
 
         return converted;
@@ -242,10 +241,10 @@ class Content extends React.Component {
             var newName = name;
 
             config.importantFiles.forEach(item => {
-                    if(item.filename.toLowerCase() === name.toLowerCase()){
-                        console.log(item.title);
-                        newName = item.title;
-                    }
+                if(item.filename.toLowerCase() === name.toLowerCase()){
+                    console.log(item.title);
+                    newName = item.title;
+                }
             })
 
             return newName;
