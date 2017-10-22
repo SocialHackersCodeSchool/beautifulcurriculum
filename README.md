@@ -8,7 +8,7 @@ This website is updated whenever code is pushed to master.
 ## What is the goal of this project?
 Currently, the HackYourFuture curriculm is difficult to navigate between, fairly confusing when first approached and is not easy to use on mobile. With BeautifulCurriculum I (we) want to present the curriculum in an easy to digest way that promotes and encourage the reader to browse at their leisure.
 
-Technically, the back end for the curriculum should only rely on the raw Markdown files in Github with all changes only made in CSS. Navigation structure for the BC should also follow the same struction as on Github e.g. *beautifulcurriculum.com/HTML-CSS/Week1/README.md* equates to *github.com/HTML-CSS/Week1/README.md*.
+Technically, the back end for the curriculum should only rely on the raw Markdown files in Github with all changes only made in CSS. Navigation structure for the BC should also follow the same struction as on Github e.g. *xyz.com/HTML-CSS/Week1/README.md* equates to *github.com/HTML-CSS/Week1/README.md*.
 
 ## How does this work?
 Using the GitHub API the website queries the root repositiories of all of the included modules. When the user clicks on a link it will attempt to load the file requested. If the file is a Markdown file then it was convert the markdown into HTML tags and load them in the window. If the file is a directory then at the moment it will fail. In the future graceful handling of dictories is required.
