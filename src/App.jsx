@@ -108,7 +108,7 @@ class Content extends React.Component {
     }
 
     loadSideNav(){
-        config.modules.forEach(module => {
+        for (let [index, module] of config.modules.entries()) {
             fetch("https://api.github.com/repos/"+ module)
             .then(response => response.json())
             .then(json => {
@@ -122,11 +122,11 @@ class Content extends React.Component {
                     })
 
                     var arrayvar = this.state.modules.slice();
-                    arrayvar.push({repo:json, dirs:directories});
+                    arrayvar.splice(index, 0, {repo:json, dirs:directories});
                     this.setState({ modules: arrayvar });
                 });
             });
-        });
+        }
     }
 
     getModuleContents(repoName, callback){
