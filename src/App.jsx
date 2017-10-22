@@ -8,6 +8,18 @@ import * as linkify from 'linkifyjs';
 import linkifyHtml from 'linkifyjs/html';
 
 class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            showMenu: true
+        };
+        this.toggleShowMenu = this.toggleShowMenu.bind(this);
+    }
+
+    toggleShowMenu(){
+        this.setState({showMenu : !this.state.showMenu});
+    }
+
     componentDidMount() {
         this.setFavicon();
     }
@@ -23,8 +35,8 @@ class App extends Component {
     render() {
         return (
             <div>
-                <Nav />
-                <Content />
+                <Nav toggleShowMenu={this.toggleShowMenu} />
+                <Content showMenu={this.state.showMenu}/>
             </div>
         );
     }
@@ -36,7 +48,8 @@ class Content extends React.Component {
         this.state = {
             html: "",
             modules: [],
-            content: {}
+            content: {},
+            showMenu: true
         };
     }
 
@@ -282,10 +295,14 @@ class Content extends React.Component {
             )
         }
 
+        function getToggled(){
+            return self.props.showMenu ? "" : "toggled"
+        }
+
         return (
-            <div class="container-fluid">
-                <div class="row">
-                    <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+            <div id="wrapper" class={getToggled()}>
+                <div id="sidebar-wrapper">
+                    <nav class="d-none d-sm-block bg-light sidebar">
                         <ul class="nav nav-pills flex-column">
                             <a class="nav-link" href="/">Home</a>
                             {this.state.modules.map((item, index) => {
@@ -293,10 +310,15 @@ class Content extends React.Component {
                             })}
                         </ul>
                     </nav>
-
-                    <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
-                        <div dangerouslySetInnerHTML={{ __html: this.state.html }} />
-                    </main>
+                </div>
+                <div id="page-content-wrapper">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div dangerouslySetInnerHTML={{ __html: this.state.html }} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -314,6 +336,9 @@ class Nav extends React.Component {
 
                 <div className="collapse navbar-collapse" id="navbarsExampleDefault">
                     <ul className="navbar-nav mr-auto">
+                        <li className="nav-item">
+                            <a className="nav-link" href="#" onClick={this.props.toggleShowMenu}>Toggle Menu</a>
+                        </li>
                         <li className="nav-item active">
                             <a className="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                         </li>
